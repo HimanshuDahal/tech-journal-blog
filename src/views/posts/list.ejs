@@ -1,0 +1,25 @@
+<%- include('../partials/navbar') %> <%- include('../partials/messages') %>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>All Posts</h2>
+    <% if (currentUser) { %>
+    <a class="btn btn-success" href="/posts/new">New Post</a>
+    <% } %>
+  </div>
+  <div class="list-group mt-3">
+    <% posts.forEach(p => { %>
+    <a
+      class="list-group-item list-group-item-action"
+      href="/posts/<%= p._id %>"
+    >
+      <h5><%= p.title %></h5>
+      <small class="text-muted"
+        ><%= p.author.username %> • <%= p.createdAt.toDateString() %></small
+      >
+    </a>
+    <% }) %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
