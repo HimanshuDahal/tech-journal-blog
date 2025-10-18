@@ -1,0 +1,33 @@
+<%- include('../partials/navbar') %>
+<%- include('../partials/messages') %>
+
+<div class="container mt-4">
+  <h2>Edit Post</h2>
+  <form action="/posts/<%= post._id %>/edit" method="post">
+    <div class="form-group">
+      <label>Title</label>
+      <input name="title" class="form-control" value="<%= post.title %>" required maxlength="150">
+    </div>
+    <div class="form-group">
+      <label>Content</label>
+      <textarea name="content" class="form-control" rows="8" required><%= post.content %></textarea>
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select name="category" class="form-control">
+        <option <%= post.category==='Linux'?'selected':'' %>>Linux</option>
+        <option <%= post.category==='Web Dev'?'selected':'' %>>Web Dev</option>
+        <option <%= post.category==='Security'?'selected':'' %>>Security</option>
+        <option <%= post.category==='Automation'?'selected':'' %>>Automation</option>
+        <option <%= post.category==='Other'?'selected':'' %>>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tags</label>
+      <input name="tags" class="form-control" value="<%= post.tags.join(', ') %>">
+    </div>
+    <button class="btn btn-primary">Save Changes</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

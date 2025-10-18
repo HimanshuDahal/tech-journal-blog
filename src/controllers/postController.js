@@ -38,3 +38,42 @@ exports.detail = async (req, res) => {
   if (!post) return res.status(404).render("home/404");
   res.render("posts/detail", { post });
 };
+
+exports.editForm = async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post || post.author.toString() !== req.session.user.id) {
+    req.flash("error", "Not authorized");
+    return res.redirect("/posts");
+  }
+  res.render("posts/edit", { post });
+};
+
+exports.update = async (req, res) => {
+  const { title, content, category, tags } = req.body;
+  const post = await Post.findById(req.params.id);
+  if (!post || post.author.toString() !== req.session.user.id) {
+    req.flash("error", "Not authorized");
+    return res.redirect("/posts");
+  }
+  post.title = title;
+  post.content = content;
+  post.category = category;
+  post.tags = (tags || "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+  await post.save();
+  req.flash("success", "Post updated");
+  res.redirect(`/posts/${post._id}`);
+};
+
+exports.remove = async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post || post.author.toString() !== req.session.user.id) {
+    req.flash("error", "Not authorized");
+    return res.redirect("/posts");
+  }
+  await post.deleteOne();
+  req.flash("success", "Post deleted");
+  res.redirect("/posts");
+};
