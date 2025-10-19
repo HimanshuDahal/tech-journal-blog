@@ -8,16 +8,15 @@
   >
     <span class="navbar-toggler-icon"></span>
   </button>
+
   <div class="collapse navbar-collapse" id="nav">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
       <li class="nav-item"><a class="nav-link" href="/posts">Blog</a></li>
-      <li class="nav-item">
-        <a class="nav-link" href="/auth/signup">Signup</a>
-      </li>
-      <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
     </ul>
-    <form class="form-inline" action="/posts" method="get">
+
+    <!-- Search form -->
+    <form class="form-inline my-2 my-lg-0 mr-3" action="/posts" method="get">
       <input
         class="form-control mr-sm-2"
         type="search"
@@ -28,5 +27,26 @@
         Search
       </button>
     </form>
+
+    <!-- Auth links -->
+    <ul class="navbar-nav">
+      <% if (!currentUser) { %>
+      <li class="nav-item">
+        <a class="nav-link" href="/auth/signup">Signup</a>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
+      <% } else { %>
+      <li class="nav-item">
+        <span class="navbar-text text-white mr-2">
+          Welcome, <%= currentUser.username %>
+        </span>
+      </li>
+      <li class="nav-item">
+        <form action="/auth/logout" method="post" class="form-inline">
+          <button class="btn btn-sm btn-outline-light">Logout</button>
+        </form>
+      </li>
+      <% } %>
+    </ul>
   </div>
 </nav>
