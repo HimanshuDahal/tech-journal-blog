@@ -41,6 +41,10 @@
           Welcome, <%= currentUser.username %>
         </span>
       </li>
+      <!-- Create Post link only for logged-in users -->
+      <li class="nav-item">
+        <a class="nav-link" href="/posts/new">Create Post</a>
+      </li>
       <li class="nav-item">
         <form action="/auth/logout" method="post" class="form-inline">
           <button class="btn btn-sm btn-outline-light">Logout</button>

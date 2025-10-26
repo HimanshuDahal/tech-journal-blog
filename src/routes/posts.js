@@ -1,26 +1,100 @@
-const router = require("express").Router();
-const { requireAuth } = require("../middleware/auth");
-const ctrl = require("../controllers/postController");
+const express = require("express");
+const router = express.Router();
+const Post = require("../models/Post");
 
-// List all posts (with search support)
-router.get("/", ctrl.list);
+// Middleware to protect routes
+function isLoggedIn(req, res, next) {
+  if (req.session && req.session.user) {
+    return next();
+  }
+  req.flash("error", "You must be logged in first!");
+  res.redirect("/auth/login");
+}
 
-// New post form
-router.get("/new", requireAuth, ctrl.createForm);
+// GET all posts (with optional search)
+router.get("/", async (req, res) => {
+  try {
+    let query = {};
+    if (req.query.q) {
+      query = { title: new RegExp(req.query.q, "i") };
+    }
+    const posts = await Post.find(query).populate("author");
+    res.render("posts/list", { posts });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Error fetching posts");
+    res.redirect("/");
+  }
+});
 
-// Create post
-router.post("/", requireAuth, ctrl.create);
+// GET new post form
+router.get("/new", isLoggedIn, (req, res) => {
+  res.render("posts/create");
+});
 
-// Post detail
-router.get("/:id", ctrl.detail);
+// POST create new post
+router.post("/", isLoggedIn, async (req, res) => {
+  try {
+    const { title, content } = req.body;
 
-// Edit form
-router.get("/:id/edit", requireAuth, ctrl.editForm);
+    console.log("Session user at post creation:", req.session.user);
 
-// Update post (using POST for simplicity; could also use PUT with method-override)
-router.post("/:id/edit", requireAuth, ctrl.update);
+    await Post.create({
+      title,
+      content,
+      author: req.session.user._id,
+    });
 
-// Delete post (using POST for simplicity; could also use DELETE with method-override)
-router.post("/:id/delete", requireAuth, ctrl.remove);
+    req.flash("success", "Post created successfully!");
+    res.redirect("/posts");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Error creating post");
+    res.redirect("/posts");
+  }
+});
+
+// GET edit form
+router.get("/:id/edit", isLoggedIn, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      req.flash("error", "Post not found");
+      return res.redirect("/posts");
+    }
+    res.render("posts/edit", { post });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Error loading edit form");
+    res.redirect("/posts");
+  }
+});
+
+// UPDATE post
+router.post("/:id", isLoggedIn, async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    await Post.findByIdAndUpdate(req.params.id, { title, content });
+    req.flash("success", "Post updated successfully!");
+    res.redirect("/posts");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Error updating post");
+    res.redirect("/posts");
+  }
+});
+
+// DELETE post
+router.post("/:id/delete", isLoggedIn, async (req, res) => {
+  try {
+    await Post.findByIdAndDelete(req.params.id);
+    req.flash("success", "Post deleted successfully!");
+    res.redirect("/posts");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Error deleting post");
+    res.redirect("/posts");
+  }
+});
 
 module.exports = router;

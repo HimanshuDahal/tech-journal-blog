@@ -10,12 +10,17 @@ exports.postSignup = async (req, res) => {
       req.flash("error", "Passwords do not match");
       return res.redirect("/auth/signup");
     }
+
     const passwordHash = await User.hashPassword(password);
     const user = await User.create({ username, email, passwordHash });
-    req.session.user = { id: user._id, username: user.username };
+
+    // ✅ Store _id as string for session safety
+    req.session.user = { _id: user._id.toString(), username: user.username };
+
     req.flash("success", "Signup successful");
     res.redirect("/");
   } catch (err) {
+    console.error(err);
     req.flash("error", err.message);
     res.redirect("/auth/signup");
   }
@@ -25,14 +30,19 @@ exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+
     if (!user || !(await user.validatePassword(password))) {
       req.flash("error", "Invalid credentials");
       return res.redirect("/auth/login");
     }
-    req.session.user = { id: user._id, username: user.username };
+
+    // ✅ Store _id as string for session safety
+    req.session.user = { _id: user._id.toString(), username: user.username };
+
     req.flash("success", "Welcome back");
     res.redirect("/");
   } catch (err) {
+    console.error(err);
     req.flash("error", "Login failed");
     res.redirect("/auth/login");
   }

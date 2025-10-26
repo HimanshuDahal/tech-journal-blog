@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon src/server.js",
+    "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "sass": "sass --no-source-map src/public/scss:src/public/css",
     "less": "lessc src/public/less/main.less src/public/css/main.css",

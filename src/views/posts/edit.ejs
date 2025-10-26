@@ -3,7 +3,8 @@
 
 <div class="container mt-4">
   <h2>Edit Post</h2>
-  <form action="/posts/<%= post._id %>/edit" method="post">
+  <form action="/posts/<%= post._id %>" method="post">
+
     <div class="form-group">
       <label>Title</label>
       <input name="title" class="form-control" value="<%= post.title %>" required maxlength="150">
